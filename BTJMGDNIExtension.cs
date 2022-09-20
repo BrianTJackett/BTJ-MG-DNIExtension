@@ -29,17 +29,20 @@ public class BTJMGDNIKernelExtension : IKernelExtension
                                          "Application (client) secret registered in Azure Active Directory.");
         var scopeNameOption = new Option<string>(new[] { "-n", "--scope-name"},
                                         description: "Scope name for Microsoft Graph connection.", getDefaultValue:() => "graphClient");
+        var authenticationFlowOption = new Option<AuthenticationFlow>(new[] { "-a", "--authentication-flow" },
+                                        description:"Azure Active Directory authentication flow to use.", getDefaultValue:() => AuthenticationFlow.ClientCredential);
 
         var graphCommand = new Command("#!microsoftgraph", "Send Microsoft Graph requests using the specified permission flow.")
         {
             tenantIdOption,
             clientIdOption,
             clientSecretOption,
-            scopeNameOption
+            scopeNameOption,
+            authenticationFlowOption
         };
 
         graphCommand.SetHandler(
-            async (string tenantId, string clientId, string clientSecret, string scopeName) =>
+            async (string tenantId, string clientId, string clientSecret, string scopeName, AuthenticationFlow authenticationFlow) =>
             {
                 var graphServiceClient = GetAuthenticatedGraphClient(tenantId, clientId, clientSecret);
                 await cSharpKernel.SetValueAsync(scopeName, graphServiceClient, typeof(GraphServiceClient));
@@ -48,7 +51,8 @@ public class BTJMGDNIKernelExtension : IKernelExtension
             tenantIdOption,
             clientIdOption,
             clientSecretOption,
-            scopeNameOption);
+            scopeNameOption,
+            authenticationFlowOption);
 
         cSharpKernel.AddDirective(graphCommand);
 
@@ -74,5 +78,11 @@ public class BTJMGDNIKernelExtension : IKernelExtension
 
         Console.WriteLine("Set the Graph client");
         return graphServiceClient;
+    }
+
+    private enum AuthenticationFlow
+    {
+        DeviceCode,
+        ClientCredential
     }
 }
