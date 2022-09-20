@@ -1,7 +1,9 @@
 ﻿using Azure.Identity;
 using System;
 using System.CommandLine;
+using System.CommandLine.Invocation;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.CSharp;
@@ -44,7 +46,7 @@ public class BTJMGDNIKernelExtension : IKernelExtension
         graphCommand.SetHandler(
             async (string tenantId, string clientId, string clientSecret, string scopeName, AuthenticationFlow authenticationFlow) =>
             {
-                var graphServiceClient = GetAuthenticatedGraphClient(tenantId, clientId, clientSecret);
+                var graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
                 await cSharpKernel.SetValueAsync(scopeName, graphServiceClient, typeof(GraphServiceClient));
                 KernelInvocationContextExtensions.Display(KernelInvocationContext.Current, $"Graph client declared with name: {scopeName}");
             }, 
@@ -61,7 +63,7 @@ public class BTJMGDNIKernelExtension : IKernelExtension
         return;
     }
 
-    private static GraphServiceClient GetAuthenticatedGraphClient(string tenantId, string clientId, string clientSecret)
+    private static GraphServiceClient GetAuthenticatedGraphClientClientCredential(string tenantId, string clientId, string clientSecret)
     {
         //this specific scope means that application will default to what is defined in the application registration rather than using dynamic scopes
         var scopes = new [] {SCOPES_STRING};
@@ -73,10 +75,32 @@ public class BTJMGDNIKernelExtension : IKernelExtension
 
         var clientSecretCredential = new ClientSecretCredential(
             tenantId, clientId, clientSecret, options);
-
+        
         var graphServiceClient = new GraphServiceClient(clientSecretCredential, scopes);
 
-        Console.WriteLine("Set the Graph client");
+        return graphServiceClient;
+    }
+
+    private static GraphServiceClient GetAuthenticatedGraphClientDeviceCode(string tenantId, string clientId, string clientSecret)
+    {
+        //this specific scope means that application will default to what is defined in the application registration rather than using dynamic scopes
+        var scopes = new [] {SCOPES_STRING};
+
+        var options = new TokenCredentialOptions
+        {
+            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+        };
+
+        Func<DeviceCodeInfo, CancellationToken, Task> callback = (code, cancellation) => {
+            Console.WriteLine(code.Message);
+            return Task.FromResult(0);
+        };
+
+        var deviceCodeCredential = new DeviceCodeCredential(
+            callback, tenantId, clientId, options);
+
+        var graphServiceClient = new GraphServiceClient(deviceCodeCredential, scopes);
+
         return graphServiceClient;
     }
 
