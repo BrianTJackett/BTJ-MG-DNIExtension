@@ -1,7 +1,6 @@
 ﻿using Azure.Identity;
 using System;
 using System.CommandLine;
-using System.CommandLine.Invocation;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
