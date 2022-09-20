@@ -11,5 +11,7 @@ bld/
 [Oo]bj/
 [Ll]og/
 
+settings.json
+
 # test .Net Interactive notebook
 BTJMGDNIExtension.ipynb
