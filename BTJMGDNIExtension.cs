@@ -23,15 +23,17 @@ public class BTJMGDNIKernelExtension : IKernelExtension
         var cSharpKernel = cs.ChildKernels.OfType<CSharpKernel>().FirstOrDefault();
 
         var tenantIdOption = new Option<string>(new[] { "-t", "--tenant-id" },
-                                         "Directory (tenant) ID in Azure Active Directory.");
+                                        description: "Directory (tenant) ID in Azure Active Directory.");
         var clientIdOption = new Option<string>(new[] { "-c", "--client-id" },
-                                         "Application (client) ID registered in Azure Active Directory.");
+                                        description: "Application (client) ID registered in Azure Active Directory.");
         var clientSecretOption = new Option<string>(new[] { "-s", "--client-secret" },
-                                         "Application (client) secret registered in Azure Active Directory.");
+                                        description: "Application (client) secret registered in Azure Active Directory.");
         var scopeNameOption = new Option<string>(new[] { "-n", "--scope-name"},
-                                        description: "Scope name for Microsoft Graph connection.", getDefaultValue:() => "graphClient");
+                                        description: "Scope name for Microsoft Graph connection.",
+                                        getDefaultValue:() => "graphClient");
         var authenticationFlowOption = new Option<AuthenticationFlow>(new[] { "-a", "--authentication-flow" },
-                                        description:"Azure Active Directory authentication flow to use.", getDefaultValue:() => AuthenticationFlow.ClientCredential);
+                                        description:"Azure Active Directory authentication flow to use.",
+                                        getDefaultValue:() => AuthenticationFlow.ClientCredential);
 
         var graphCommand = new Command("#!microsoftgraph", "Send Microsoft Graph requests using the specified permission flow.")
         {
@@ -49,14 +51,14 @@ public class BTJMGDNIKernelExtension : IKernelExtension
                 switch (authenticationFlow)
                 {
                     case AuthenticationFlow.DeviceCode:
-                        graphServiceClient = GetAuthenticatedGraphClientDeviceCode(tenantId, clientId, clientSecret);
+                        graphServiceClient = GetAuthenticatedGraphClientDeviceCode(tenantId, clientId);
                         break;
                     case AuthenticationFlow.ClientCredential:
                     default:
                         graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
                         break;
+
                 }
-                //var graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
                 await cSharpKernel.SetValueAsync(scopeName, graphServiceClient, typeof(GraphServiceClient));
                 KernelInvocationContextExtensions.Display(KernelInvocationContext.Current, $"Graph client declared with name: {scopeName}");
             },
@@ -91,7 +93,7 @@ public class BTJMGDNIKernelExtension : IKernelExtension
         return graphServiceClient;
     }
 
-    private static GraphServiceClient GetAuthenticatedGraphClientDeviceCode(string tenantId, string clientId, string clientSecret)
+    private static GraphServiceClient GetAuthenticatedGraphClientDeviceCode(string tenantId, string clientId)
     {
         //this specific scope means that application will default to what is defined in the application registration rather than using dynamic scopes
         var scopes = new [] {SCOPES_STRING};
