@@ -34,7 +34,7 @@ public class BTJMGDNIKernelExtension : IKernelExtension
                                         getDefaultValue:() => "graphClient");
         var authenticationFlowOption = new Option<AuthenticationFlow>(new[] { "-a", "--authentication-flow" },
                                         description:"Azure Active Directory authentication flow to use.",
-                                        getDefaultValue:() => AuthenticationFlow.ClientCredential);
+                                        getDefaultValue:() => AuthenticationFlow.InteractiveBrowser);
 
         var graphCommand = new Command("#!microsoftgraph", "Send Microsoft Graph requests using the specified permission flow.")
         {
