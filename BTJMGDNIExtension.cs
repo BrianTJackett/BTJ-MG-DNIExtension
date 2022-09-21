@@ -53,6 +53,9 @@ public class BTJMGDNIKernelExtension : IKernelExtension
                     case AuthenticationFlow.DeviceCode:
                         graphServiceClient = GetAuthenticatedGraphClientDeviceCode(tenantId, clientId);
                         break;
+                    case AuthenticationFlow.InteractiveBrowser:
+                        graphServiceClient = GetAuthenticatedGraphClientInteractiveBrowser(tenantId, clientId);
+                        break;
                     case AuthenticationFlow.ClientCredential:
                     default:
                         graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
@@ -116,9 +119,27 @@ public class BTJMGDNIKernelExtension : IKernelExtension
         return graphServiceClient;
     }
 
+    private static GraphServiceClient GetAuthenticatedGraphClientInteractiveBrowser(string tenantId, string clientId)
+    {
+        //this specific scope means that application will default to what is defined in the application registration rather than using dynamic scopes
+        var scopes = new [] {SCOPES_STRING};
+
+        var options = new InteractiveBrowserCredentialOptions
+        {
+            AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
+            RedirectUri = new Uri("http://localhost")
+        };
+
+        var interactiveBrowserCredential = new InteractiveBrowserCredential(
+            tenantId, clientId, options);
+
+        return new GraphServiceClient(interactiveBrowserCredential, scopes);
+    }
+
     private enum AuthenticationFlow
     {
+        ClientCredential,
         DeviceCode,
-        ClientCredential
+        InteractiveBrowser
     }
 }
