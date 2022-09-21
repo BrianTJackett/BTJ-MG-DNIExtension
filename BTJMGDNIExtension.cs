@@ -13,12 +13,12 @@ namespace BTJMGDNIExtension;
 public class BTJMGDNIKernelExtension : IKernelExtension
 {
     private static string SCOPES_STRING = "https://graph.microsoft.com/.default";
-    
-    public async Task OnLoadAsync(Kernel kernel)
+
+    public Task OnLoadAsync(Kernel kernel)
     {
-        if(kernel is not CompositeKernel cs)
+        if (kernel is not CompositeKernel cs)
         {
-            return;
+            return Task.CompletedTask;
         }
         var cSharpKernel = cs.ChildKernels.OfType<CSharpKernel>().FirstOrDefault();
 
@@ -45,10 +45,21 @@ public class BTJMGDNIKernelExtension : IKernelExtension
         graphCommand.SetHandler(
             async (string tenantId, string clientId, string clientSecret, string scopeName, AuthenticationFlow authenticationFlow) =>
             {
-                var graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
+                GraphServiceClient graphServiceClient;
+                switch (authenticationFlow)
+                {
+                    case AuthenticationFlow.DeviceCode:
+                        graphServiceClient = GetAuthenticatedGraphClientDeviceCode(tenantId, clientId, clientSecret);
+                        break;
+                    case AuthenticationFlow.ClientCredential:
+                    default:
+                        graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
+                        break;
+                }
+                //var graphServiceClient = GetAuthenticatedGraphClientClientCredential(tenantId, clientId, clientSecret);
                 await cSharpKernel.SetValueAsync(scopeName, graphServiceClient, typeof(GraphServiceClient));
                 KernelInvocationContextExtensions.Display(KernelInvocationContext.Current, $"Graph client declared with name: {scopeName}");
-            }, 
+            },
             tenantIdOption,
             clientIdOption,
             clientSecretOption,
@@ -59,7 +70,7 @@ public class BTJMGDNIKernelExtension : IKernelExtension
 
         cSharpKernel.DeferCommand(new SubmitCode("using Microsoft.Graph;"));
 
-        return;
+        return Task.CompletedTask;
     }
 
     private static GraphServiceClient GetAuthenticatedGraphClientClientCredential(string tenantId, string clientId, string clientSecret)
@@ -74,7 +85,7 @@ public class BTJMGDNIKernelExtension : IKernelExtension
 
         var clientSecretCredential = new ClientSecretCredential(
             tenantId, clientId, clientSecret, options);
-        
+
         var graphServiceClient = new GraphServiceClient(clientSecretCredential, scopes);
 
         return graphServiceClient;
