@@ -9,8 +9,21 @@ using Azure.Identity;
 
 namespace BTJMGDNIExtension
 {
+    /// <summary>
+    /// Helper class to create an appropriate TokenCredential
+    /// based on the requested authentication flow.
+    /// </summary>
     public class CredentialProvider
     {
+        /// <summary>
+        /// Gets the TokenCredential based on the requested authentication flow.
+        /// </summary>
+        /// <param name="authenticationFlow">The requested authentication flow.</param>
+        /// <param name="tenantId">Tenant ID for single-tenant apps, or "common" for multi-tenant.</param>
+        /// <param name="clientId">The client ID from the app registration in Azure portal.</param>
+        /// <param name="clientSecret">The client secret (only applicable to ClientCredential flow).</param>
+        /// <returns>The requested TokenCredential.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">The requested authentication flow was invalid.</exception>
         public static TokenCredential GetTokenCredential(
             AuthenticationFlow authenticationFlow,
             string tenantId,
@@ -22,17 +35,15 @@ namespace BTJMGDNIExtension
                 AuthenticationFlow.InteractiveBrowser => GetInteractiveBrowserCredential(tenantId, clientId),
                 _ => throw new ArgumentOutOfRangeException(
                     nameof(authenticationFlow),
-                    $"Unexpected authenticationFlow value: {authenticationFlow}")
+                    $"Unexpected authenticationFlow value: {authenticationFlow}"),
             };
 
         private static ClientSecretCredential GetClientSecretCredential(
-        string tenantId,
-        string clientId,
-        string clientSecret)
+            string tenantId, string clientId, string clientSecret)
         {
             var options = new TokenCredentialOptions
             {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
             };
 
             return new ClientSecretCredential(tenantId, clientId, clientSecret, options);
@@ -43,7 +54,7 @@ namespace BTJMGDNIExtension
         {
             var options = new TokenCredentialOptions
             {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
             };
 
             Func<DeviceCodeInfo, CancellationToken, Task> callback = (code, cancellation) =>
@@ -61,7 +72,7 @@ namespace BTJMGDNIExtension
             var options = new InteractiveBrowserCredentialOptions
             {
                 AuthorityHost = AzureAuthorityHosts.AzurePublicCloud,
-                RedirectUri = new Uri("http://localhost")
+                RedirectUri = new Uri("http://localhost"),
             };
 
             return new InteractiveBrowserCredential(tenantId, clientId, options);
