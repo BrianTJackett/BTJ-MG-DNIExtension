@@ -1,8 +1,10 @@
 # BTJ-MG-DNIExtension
 
-Sample implementation of Microsoft Graph kernel for .Net Interactive.
+Sample implementation of Microsoft Graph magic command / extension for .Net Interactive.
 
 ## Test notebook
+
+### Build and import
 
 The below commands can be used to build as a NuGet package (C#), import, and call via magic command.
 
@@ -17,17 +19,41 @@ dotnet pack /p:PackageVersion=1.0.<incrementVersionNumber>
 #r "nuget:BTJMGDNIExtension,*"
 ```
 
+### Test extension
+
 Display help for "microsoftgraph" magic command
 
 ```text
 #!microsoftgraph -h
 ```
 
-Instantiate new connection to Microsoft Graph (client credential authentication flow for now), default variable name of "graphClient"
+Instantiate new connections to Microsoft Graph (using each authentication flow), specify unique scope name for parallel use
 
 ```text
-#!microsoftgraph --tenant-id <tenantId> --client-id <clientId> --client-secret <clientSecret>
+#!microsoftgraph --authentication-flow InteractiveBrowser --scope-name gcInteractiveBrowser --tenant-id <tenantId> --client-id <clientId>
+#!microsoftgraph --authentication-flow DeviceCode --scope-name gcDeviceCode --tenant-id <tenantId> --client-id <clientId>
+#!microsoftgraph --authentication-flow ClientCredential --scope-name gcClientCredential --tenant-id <tenantId> --client-id <clientId> --client-secret <clientSecret>
 ```
+
+**Interactive Browser sample snippet**
+
+```csharp
+var me = await gcInteractiveBrowser.Me.Request().GetAsync();
+Console.WriteLine($"Me: {me.DisplayName}, {me.UserPrincipalName}");
+```
+
+**Device Code sample snippet**
+
+```csharp
+var users = await gcDeviceCode.Users.Request()
+.Top(5)
+.Select(u => new {u.DisplayName, u.UserPrincipalName})
+.GetAsync();
+
+users.Select(u => new {u.DisplayName, u.UserPrincipalName})
+```
+
+**Client Credential sample snippet**
 
 ```csharp
 var queryOptions = new List<QueryOption>()
@@ -35,9 +61,10 @@ var queryOptions = new List<QueryOption>()
 new QueryOption("$count", "true")
 };
 
-var applications = await graphClient.Applications
+var applications = await gcClientCredential.Applications
 .Request( queryOptions )
 .Header("ConsistencyLevel","eventual")
+.Top(5)
 .Select(a => new {a.AppId, a.DisplayName})
 .GetAsync();
 
