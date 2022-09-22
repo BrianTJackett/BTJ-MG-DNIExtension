@@ -38,4 +38,11 @@
     <None Include="$(OutputPath)/Microsoft.DotNet.Interactive.MicrosoftGraph.dll" Pack="true" PackagePath="interactive-extensions/dotnet" />
   </ItemGroup>
 
+  <Target Name="MyTarget" AfterTargets="MinVer">
+    <PropertyGroup>
+      <PackageVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</PackageVersion>
+      <Version>$(PackageVersion)</Version>
+    </PropertyGroup>
+  </Target>
+
 </Project>

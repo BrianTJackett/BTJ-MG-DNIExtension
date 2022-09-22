@@ -9,9 +9,8 @@ Sample implementation of Microsoft Graph magic command / extension for .Net Inte
 The below commands can be used to build as a NuGet package (C#), import, and call via magic command.
 
 ```text
-dotnet build
 rm ~/.nuget/packages/Microsoft.DotNet.Interactive.MicrosoftGraph -Force -Recurse -ErrorAction Ignore
-dotnet pack /p:PackageVersion=1.0.<incrementVersionNumber>
+dotnet build
 ```
 
 ```text
