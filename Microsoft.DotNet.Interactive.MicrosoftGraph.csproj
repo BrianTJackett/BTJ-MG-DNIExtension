@@ -41,7 +41,6 @@
   <Target Name="MyTarget" AfterTargets="MinVer">
     <PropertyGroup>
       <PackageVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</PackageVersion>
-      <Version>$(PackageVersion)</Version>
     </PropertyGroup>
   </Target>
 
