@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
-namespace BTJMGDNIExtension
+namespace Microsoft.DotNet.Interactive.MicrosoftGraph
 {
     /// <summary>
     /// Supported authentication flows.

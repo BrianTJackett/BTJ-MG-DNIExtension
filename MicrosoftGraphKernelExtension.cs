@@ -4,18 +4,17 @@
 using System.CommandLine;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.DotNet.Interactive;
 using Microsoft.DotNet.Interactive.Commands;
 using Microsoft.DotNet.Interactive.CSharp;
 using Microsoft.Graph;
 
-namespace BTJMGDNIExtension;
+namespace Microsoft.DotNet.Interactive.MicrosoftGraph;
 
 /// <summary>
 /// .NET Interactive magic command extension to provide
 /// authenticated Microsoft Graph clients.
 /// </summary>
-public class BTJMGDNIKernelExtension : IKernelExtension
+public class MicrosoftGraphKernelExtension : IKernelExtension
 {
     private static string[] scopes = new[] { "https://graph.microsoft.com/.default" };
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Azure.Core;
 using Azure.Identity;
 
-namespace BTJMGDNIExtension
+namespace Microsoft.DotNet.Interactive.MicrosoftGraph
 {
     /// <summary>
     /// Helper class to create an appropriate TokenCredential

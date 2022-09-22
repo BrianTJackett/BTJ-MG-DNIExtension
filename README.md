@@ -10,13 +10,13 @@ The below commands can be used to build as a NuGet package (C#), import, and cal
 
 ```text
 dotnet build
-rm ~/.nuget/packages/BTJMGDNIExtension -Force -Recurse -ErrorAction Ignore
+rm ~/.nuget/packages/Microsoft.DotNet.Interactive.MicrosoftGraph -Force -Recurse -ErrorAction Ignore
 dotnet pack /p:PackageVersion=1.0.<incrementVersionNumber>
 ```
 
 ```text
 #i nuget:<REPLACE_WITH_WORKING_DIRECTORY>\BTJ-MG-DNIExtension\bin\Debug\
-#r "nuget:BTJMGDNIExtension,*"
+#r "nuget:Microsoft.DotNet.Interactive.MicrosoftGraph,*"
 ```
 
 ### Test extension

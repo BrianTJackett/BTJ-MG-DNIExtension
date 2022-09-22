@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="$(OutputPath)/BTJMGDNIExtension.dll" Pack="true" PackagePath="interactive-extensions/dotnet" />
+    <None Include="$(OutputPath)/Microsoft.DotNet.Interactive.MicrosoftGraph.dll" Pack="true" PackagePath="interactive-extensions/dotnet" />
   </ItemGroup>
 
 </Project>
